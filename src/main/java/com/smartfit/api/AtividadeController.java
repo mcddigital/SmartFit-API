@@ -61,4 +61,27 @@ public class AtividadeController {
                 "data", salva.getData().toString()
             ));
     }
+
+    @GetMapping
+    public ResponseEntity<?> listar(
+            Authentication authentication) {
+
+        Usuario usuario = usuarios
+            .findByEmail(authentication.getName())
+            .orElseThrow();
+
+        var historico = atividades
+            .findByUsuarioIdOrderByDataDesc(usuario.getId())
+            .stream()
+            .map(atividade -> Map.of(
+                "id", atividade.getId(),
+                "tipo", atividade.getTipo(),
+                "duracaoMinutos", atividade.getDuracaoMinutos(),
+                "calorias", atividade.getCalorias(),
+                "data", atividade.getData().toString()
+            ))
+            .toList();
+
+        return ResponseEntity.ok(historico);
+    }
 }
