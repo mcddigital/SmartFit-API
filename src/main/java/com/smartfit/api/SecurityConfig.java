@@ -1,4 +1,3 @@
-
 package com.smartfit.api;
 
 import org.springframework.context.annotation.Bean;
@@ -26,7 +25,9 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/status").permitAll()
                 .requestMatchers(
-                    HttpMethod.POST, "/api/usuarios"
+                    HttpMethod.POST,
+                    "/api/usuarios",
+                    "/api/login"
                 ).permitAll()
                 .anyRequest().authenticated()
             )
