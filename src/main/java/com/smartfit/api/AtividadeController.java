@@ -1,9 +1,11 @@
+
 package com.smartfit.api;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -27,43 +29,36 @@ public class AtividadeController {
             @NotBlank String tipo,
             @NotNull @Positive Integer duracaoMinutos,
             @NotNull @PositiveOrZero Double calorias,
-            LocalDate data,
-            @NotNull Long usuarioId) {}
+            LocalDate data) {}
 
     @PostMapping
     public ResponseEntity<?> cadastrar(
-            @Valid @RequestBody NovaAtividade dados) {
+            @Valid @RequestBody NovaAtividade dados,
+            Authentication authentication) {
 
-        return usuarios.findById(dados.usuarioId())
-            .<ResponseEntity<?>>map(usuario -> {
-                Atividade atividade = new Atividade();
+        Usuario usuario = usuarios
+            .findByEmail(authentication.getName())
+            .orElseThrow();
 
-                atividade.setTipo(dados.tipo());
-                atividade.setDuracaoMinutos(
-                    dados.duracaoMinutos());
-                atividade.setCalorias(dados.calorias());
-                atividade.setData(
-                    dados.data() != null
-                        ? dados.data()
-                        : LocalDate.now());
-                atividade.setUsuario(usuario);
+        Atividade atividade = new Atividade();
+        atividade.setTipo(dados.tipo());
+        atividade.setDuracaoMinutos(dados.duracaoMinutos());
+        atividade.setCalorias(dados.calorias());
+        atividade.setData(
+            dados.data() != null
+                ? dados.data()
+                : LocalDate.now());
+        atividade.setUsuario(usuario);
 
-                Atividade salva = atividades.save(atividade);
+        Atividade salva = atividades.save(atividade);
 
-                return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(Map.of(
-                        "id", salva.getId(),
-                        "tipo", salva.getTipo(),
-                        "duracaoMinutos", salva.getDuracaoMinutos(),
-                        "calorias", salva.getCalorias(),
-                        "data", salva.getData().toString()
-                    ));
-            })
-            .orElseGet(() ->
-                ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of(
-                        "erro", "Usuario nao encontrado"
-                    ))
-            );
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(Map.of(
+                "id", salva.getId(),
+                "tipo", salva.getTipo(),
+                "duracaoMinutos", salva.getDuracaoMinutos(),
+                "calorias", salva.getCalorias(),
+                "data", salva.getData().toString()
+            ));
     }
 }
