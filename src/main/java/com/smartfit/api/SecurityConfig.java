@@ -35,10 +35,11 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http,
             DaoAuthenticationProvider provider) throws Exception {
-
-        http
-            .csrf(csrf -> csrf.disable())
-            .authenticationProvider(provider)
+        
+http
+    .cors(cors -> {})
+    .csrf(csrf -> csrf.disable())
+    .authenticationProvider(provider)
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/status").permitAll()
                 .requestMatchers(
