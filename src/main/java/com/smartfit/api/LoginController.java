@@ -16,12 +16,16 @@ public class LoginController {
 
     private final UsuarioRepository repository;
     private final PasswordEncoder encoder;
+    private final JwtService jwtService;
 
     public LoginController(
             UsuarioRepository repository,
-            PasswordEncoder encoder) {
+            PasswordEncoder encoder,
+            JwtService jwtService) {
+
         this.repository = repository;
         this.encoder = encoder;
+        this.jwtService = jwtService;
     }
 
     public record LoginRequest(
@@ -39,13 +43,18 @@ public class LoginController {
                     usuario.getSenha()
                 )
             )
-            .<ResponseEntity<?>>map(usuario ->
-                ResponseEntity.ok(Map.of(
+            .<ResponseEntity<?>>map(usuario -> {
+                String token =
+                    jwtService.gerarToken(usuario.getEmail());
+
+                return ResponseEntity.ok(Map.of(
                     "mensagem", "Login realizado com sucesso",
+                    "token", token,
                     "nome", usuario.getNome(),
-                    "id", usuario.getId()
-                ))
-            )
+                    "id", usuario.getId(),
+                    "email", usuario.getEmail()
+                ));
+            })
             .orElseGet(() ->
                 ResponseEntity.status(401)
                     .body(Map.of(
