@@ -20,9 +20,11 @@ public class Meta {
     @Positive
     private Integer objetivoMinutos;
 
-private String tipo;
-private Double objetivo;
-private String periodo;
+    private String tipo;
+
+    private Double objetivo;
+
+    private String periodo;
 
     private LocalDate dataCriacao;
 
@@ -32,31 +34,7 @@ private String periodo;
 
     public Long getId() {
         return id;
-    
-public String getTipo() {
-    return tipo;
-}
-
-public void setTipo(String tipo) {
-    this.tipo = tipo;
-}
-
-public Double getObjetivo() {
-    return objetivo;
-}
-
-public void setObjetivo(Double objetivo) {
-    this.objetivo = objetivo;
-}
-
-public String getPeriodo() {
-    return periodo;
-}
-
-public void setPeriodo(String periodo) {
-    this.periodo = periodo;
-}
-}
+    }
 
     public String getDescricao() {
         return descricao;
@@ -72,6 +50,30 @@ public void setPeriodo(String periodo) {
 
     public void setObjetivoMinutos(Integer objetivoMinutos) {
         this.objetivoMinutos = objetivoMinutos;
+    }
+
+    public String getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
+    }
+
+    public Double getObjetivo() {
+        return objetivo;
+    }
+
+    public void setObjetivo(Double objetivo) {
+        this.objetivo = objetivo;
+    }
+
+    public String getPeriodo() {
+        return periodo;
+    }
+
+    public void setPeriodo(String periodo) {
+        this.periodo = periodo;
     }
 
     public LocalDate getDataCriacao() {
