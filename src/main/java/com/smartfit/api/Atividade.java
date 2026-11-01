@@ -24,6 +24,13 @@ public class Atividade {
 
     private LocalDate data;
 
+    @PositiveOrZero
+    @Column(name = "distancia")
+    private Double distancia;
+
+    @Column(name = "observacoes", length = 2000)
+    private String observacoes;
+
     @ManyToOne(optional = false)
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;
@@ -62,6 +69,22 @@ public class Atividade {
 
     public void setData(LocalDate data) {
         this.data = data;
+    }
+
+    public Double getDistancia() {
+        return distancia;
+    }
+
+    public void setDistancia(Double distancia) {
+        this.distancia = distancia;
+    }
+
+    public String getObservacoes() {
+        return observacoes;
+    }
+
+    public void setObservacoes(String observacoes) {
+        this.observacoes = observacoes;
     }
 
     public Usuario getUsuario() {
