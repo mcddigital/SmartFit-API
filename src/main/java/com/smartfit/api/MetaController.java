@@ -223,7 +223,29 @@ public class MetaController {
         };
     }
 
-    private MetaResposta converter(Meta meta) {
+    
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> excluir(
+            @PathVariable Long id,
+            Authentication authentication) {
+
+        Usuario usuario = buscarUsuario(authentication);
+
+        Meta meta = metas
+            .findByIdAndUsuarioId(id, usuario.getId())
+            .orElseThrow(() ->
+                new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "Meta nao encontrada."
+                )
+            );
+
+        metas.delete(meta);
+
+        return ResponseEntity.noContent().build();
+    }
+
+private MetaResposta converter(Meta meta) {
 
         String tipo = meta.getTipo();
 
