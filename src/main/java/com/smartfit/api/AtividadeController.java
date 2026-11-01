@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
-import java.util.Map;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/atividades")
@@ -31,7 +31,19 @@ public class AtividadeController {
             @NotBlank String tipo,
             @NotNull @Positive Integer duracaoMinutos,
             @NotNull @PositiveOrZero Double calorias,
-            LocalDate data
+            LocalDate data,
+            @PositiveOrZero Double distancia,
+            @Size(max = 2000) String observacoes
+    ) {}
+
+    public record AtividadeResposta(
+            Long id,
+            String tipo,
+            Integer duracaoMinutos,
+            Double calorias,
+            LocalDate data,
+            Double distancia,
+            String observacoes
     ) {}
 
     private Usuario buscarUsuario(
@@ -54,39 +66,52 @@ public class AtividadeController {
             );
     }
 
+    private AtividadeResposta converter(
+            Atividade atividade) {
+
+        return new AtividadeResposta(
+            atividade.getId(),
+            atividade.getTipo(),
+            atividade.getDuracaoMinutos(),
+            atividade.getCalorias(),
+            atividade.getData(),
+            atividade.getDistancia(),
+            atividade.getObservacoes()
+        );
+    }
+
     @PostMapping
-    public ResponseEntity<?> cadastrar(
+    public ResponseEntity<AtividadeResposta> cadastrar(
             @Valid @RequestBody NovaAtividade dados,
             Authentication authentication) {
 
         Usuario usuario = buscarUsuario(authentication);
 
         Atividade atividade = new Atividade();
+
         atividade.setTipo(dados.tipo());
         atividade.setDuracaoMinutos(dados.duracaoMinutos());
         atividade.setCalorias(dados.calorias());
+
         atividade.setData(
             dados.data() != null
                 ? dados.data()
                 : LocalDate.now()
         );
+
+        atividade.setDistancia(dados.distancia());
+        atividade.setObservacoes(dados.observacoes());
         atividade.setUsuario(usuario);
 
         Atividade salva = atividades.save(atividade);
 
         return ResponseEntity
             .status(HttpStatus.CREATED)
-            .body(Map.of(
-                "id", salva.getId(),
-                "tipo", salva.getTipo(),
-                "duracaoMinutos", salva.getDuracaoMinutos(),
-                "calorias", salva.getCalorias(),
-                "data", salva.getData().toString()
-            ));
+            .body(converter(salva));
     }
 
     @GetMapping
-    public ResponseEntity<?> listar(
+    public ResponseEntity<List<AtividadeResposta>> listar(
             Authentication authentication) {
 
         Usuario usuario = buscarUsuario(authentication);
@@ -96,13 +121,7 @@ public class AtividadeController {
                 usuario.getId()
             )
             .stream()
-            .map(atividade -> Map.of(
-                "id", atividade.getId(),
-                "tipo", atividade.getTipo(),
-                "duracaoMinutos", atividade.getDuracaoMinutos(),
-                "calorias", atividade.getCalorias(),
-                "data", atividade.getData().toString()
-            ))
+            .map(this::converter)
             .toList();
 
         return ResponseEntity.ok(historico);
